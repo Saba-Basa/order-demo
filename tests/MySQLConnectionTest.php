@@ -8,25 +8,36 @@ use PDO;
 class MySQLConnectionTest extends TestCase
 {
     private array $config;
+    private $connection;
 
     protected function setUp(): void
-    {
-        $this->config = require __DIR__ . "/../config/database.php";
+{
+    $this->config = require __DIR__ . "/../config/database.php";
+    
+    // Reset singleton
+    $reflection = new \ReflectionClass(MySQLConnection::class);
+    $instance = $reflection->getProperty('instance');
+    $instance->setAccessible(true);
+    $instance->setValue(null);
+    
+    // Start transaction for rollback
+    $this->connection = MySQLConnection::getInstance($this->config);
+    $this->connection->getConnection()->beginTransaction();
+}
 
-        //reset before each test
-        $reflection = new \ReflectionClass(MySQLConnection::class);
-        $instance = $reflection->getProperty('instance');
-        $instance->setAccessible(true);
-        $instance->setValue(null);
+protected function tearDown(): void
+{
+    // Rollback all changes made during the test
+    if ($this->connection && $this->connection->isConnected()) {
+        $this->connection->getConnection()->rollBack();
     }
-    public function tearDown(): void
-    {
-        //clean after each test
-        $reflection = new \ReflectionClass(MySQLConnection::class);
-        $instance = $reflection->getProperty('instance');
-        $instance->setAccessible(true);
-        $instance->setValue(null);
-    }
+    
+    // Reset singleton
+    $reflection = new \ReflectionClass(MySQLConnection::class);
+    $instance = $reflection->getProperty('instance');
+    $instance->setAccessible(true);
+    $instance->setValue(null);
+}
 
     public function testInstance()
     {
@@ -104,5 +115,17 @@ class MySQLConnectionTest extends TestCase
         $this->assertEquals($indexKey[2], 'orders');
         $this->assertEquals($indexKey[3], 'products');
     }
+    public function testExecute(){
+        $i = MySQLConnection::getInstance($this->config);
+        $i->execute("INSERT INTO customers (name, email) VALUES ('Max Mustermann','max.mustermann@mail.com');");
+        $n = $i->query("SELECT COUNT(*) FROM customers;");
+        $k= array_column($n,"COUNT(*)");
+        $this->assertEquals($k[0],1);
+        $i->execute("DELETE FROM customers;");
+        $m = $i->query("SELECT COUNT(*) FROM customers;");
+        $j = array_column($m,"COUNT(*)");
+        $this->assertEquals($j[0],0);
+    }
+
 
 }
