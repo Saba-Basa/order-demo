@@ -29,7 +29,17 @@ class ProductRepository implements ProductRepositoryInterface
     }
     public function create(array $data): int
     {
-        return 0;
+        $sql = "INSERT INTO products (name, price, category, description, download_link) VALUES (?, ?, ?, ?, ?)";
+
+        $this->queryExecutor->execute($sql, [
+            $data['name'],
+            $data['price'],
+            $data['category'],
+            $data['description'],
+            $data['download_link']
+        ]);
+
+        return (int) $this->queryExecutor->lastInsertId();
     }
     public function delete(int $id): bool
     {

@@ -42,7 +42,7 @@ class ProductRepositoryTest extends TestCase
     {
         $connection = TestDatabase::setUp();
 
-        // Produkte einfügen
+
         $products = [
             ['product1', 9.99, 'software', 'test description', 'https://example.com/download'],
             ['product2', 9.99, 'software', 'test description', 'https://example.com/download'],
@@ -55,11 +55,7 @@ class ProductRepositoryTest extends TestCase
                 $product
             );
         }
-
-        // Beispiel: hole alle Produkte
         $result = $this->repository->findAll();
-
-        // Prüfe, ob die Namen korrekt sind
         $names = array_column($result, 'name');
 
         $this->assertContains('product1', $names);
@@ -68,5 +64,30 @@ class ProductRepositoryTest extends TestCase
 
         $this->tearDown();
     }
+
+    public function testcreate()
+    {
+        $this->setup();
+
+        $products = [
+            ['name' => 'product1', 'price' => 9.99, 'category' => 'software', 'description' => 'test description', 'download_link' => 'https://example.com/download'],
+            ['name' => 'product2', 'price' => 19.99, 'category' => 'ebook', 'description' => 'test description', 'download_link' => 'https://example.com/download2'],
+            ['name' => 'product3', 'price' => 29.99, 'category' => 'course', 'description' => 'test description', 'download_link' => 'https://example.com/download3']
+        ];
+
+        foreach ($products as $product) {
+            $this->repository->create($product);
+        }
+
+        $result = $this->repository->findAll();
+        $names = array_column($result, 'name');
+
+        $this->assertContains('product1', $names);
+        $this->assertContains('product2', $names);
+        $this->assertContains('product3', $names);
+
+        $this->tearDown();
+    }
+
 
 }
