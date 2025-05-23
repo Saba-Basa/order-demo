@@ -2,6 +2,8 @@
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
+//TODO: impl. TestDatabase
+use Tests\Support\TestDatabase;
 use App\Core\Database\MySQLConnection;
 use PDO;
 
