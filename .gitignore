@@ -1,5 +1,5 @@
-# /config/database.php
-# /vendor/
+/config/database.php
 .DS_Store
-# /composer.lock
+/composer.lock
 .vscode/
+/vendor/
