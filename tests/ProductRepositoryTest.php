@@ -89,5 +89,35 @@ class ProductRepositoryTest extends TestCase
         $this->tearDown();
     }
 
+    public function testDelete()
+    {
+        $this->setup();
+        $products = [
+            ['name' => 'product1', 'price' => 9.99, 'category' => 'software', 'description' => 'test description', 'download_link' => 'https://example.com/download'],
+            ['name' => 'product2', 'price' => 19.99, 'category' => 'ebook', 'description' => 'test description', 'download_link' => 'https://example.com/download2'],
+            ['name' => 'product3', 'price' => 29.99, 'category' => 'course', 'description' => 'test description', 'download_link' => 'https://example.com/download3']
+        ];
+
+        foreach ($products as $product) {
+            $this->repository->create($product);
+        }
+
+        $result = $this->repository->findAll();
+        $names = array_column($result, 'name');
+
+        $this->assertContains('product1', $names);
+        $this->assertContains('product2', $names);
+        $this->assertContains('product3', $names);
+
+        $firstP = $result[0]['id'];
+        print_r($firstP);
+        $this->assertNotEmpty($firstP);
+        $delete = $this->repository->delete($firstP);
+        $this->assertTrue($delete);
+        $falseDelete = $this->repository->delete(99);
+        $this->assertFalse($falseDelete);
+        $this->tearDown();
+    }
+
 
 }

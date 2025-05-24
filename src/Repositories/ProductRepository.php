@@ -43,6 +43,15 @@ class ProductRepository implements ProductRepositoryInterface
     }
     public function delete(int $id): bool
     {
+        $check = "SELECT 1 FROM products WHERE id=:id LIMIT 1;";
+        $result = $this->queryExecutor->query($check, ['id' => $id]);
+
+        if (count($result) > 0) {
+            $delete = "DELETE FROM products WHERE id=:id;";
+            $this->queryExecutor->execute($delete, ['id' => $id]);
+            return true;
+        }
+
         return false;
     }
     public function update(int $id, array $data): bool
