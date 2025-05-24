@@ -119,5 +119,48 @@ class ProductRepositoryTest extends TestCase
         $this->tearDown();
     }
 
+    public function testUpdate()
+    {
+        $this->setup();
+
+        $products = [
+            ['name' => 'product1', 'price' => 9.99, 'category' => 'software', 'description' => 'test description', 'download_link' => 'https://example.com/download'],
+            ['name' => 'product2', 'price' => 19.99, 'category' => 'ebook', 'description' => 'test description', 'download_link' => 'https://example.com/download2'],
+            ['name' => 'product3', 'price' => 29.99, 'category' => 'course', 'description' => 'test description', 'download_link' => 'https://example.com/download3']
+        ];
+
+        foreach ($products as $product) {
+            $this->repository->create($product);
+        }
+
+        $result = $this->repository->findAll();
+        $names = array_column($result, 'name');
+
+        $this->assertContains('product1', $names);
+        $this->assertContains('product2', $names);
+        $this->assertContains('product3', $names);
+
+        $newFields = [
+            'name' => 'NEWproduct1',
+            'price' => 19.99,
+            'category' => 'hardware',
+            'description' => 'Newtest description',
+            'download_link' => 'https://example-new.com/download'
+        ];
+
+        $firstId = $result[0]['id'];
+
+        $update = $this->repository->update($firstId, $newFields);
+        $this->assertTrue($update);
+
+        $updatedProduct = $this->repository->findById($firstId);
+        $this->assertNotNull($updatedProduct);
+        $this->assertEquals('NEWproduct1', $updatedProduct['name']);
+        $this->assertEquals('hardware', $updatedProduct['category']);
+        $this->assertEquals('Newtest description', $updatedProduct['description']);
+
+        $this->tearDown();
+    }
+
 
 }
